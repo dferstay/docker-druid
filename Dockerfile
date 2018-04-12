@@ -1,6 +1,6 @@
 FROM ubuntu:16.04
 
-ARG DRUID_VERSION=0.11.0
+ARG DRUID_VERSION=0.12.0
 ARG TRANQUILITY_VERSION=0.8.2
 
 RUN apt-get update && \
@@ -12,13 +12,14 @@ RUN apt-get update && \
 
 RUN curl -L http://static.druid.io/artifacts/releases/druid-${DRUID_VERSION}-bin.tar.gz | tar -zxf - -C / && \
     mv /druid-${DRUID_VERSION} /druid
+RUN curl -o /druid/hadoop-dependencies/hadoop-client/2.7.3/hadoop-aws-2.7.3.jar http://central.maven.org/maven2/org/apache/hadoop/hadoop-aws/2.7.3/hadoop-aws-2.7.3.jar
 RUN curl -L http://static.druid.io/tranquility/releases/tranquility-distribution-${TRANQUILITY_VERSION}.tgz | tar -zxf - -C / && \
     mv /tranquility-distribution-${TRANQUILITY_VERSION} /tranquility
 
 COPY run-druid.sh /druid/bin/
 COPY wait-for-dependencies.sh /druid/bin/
 
-# Druid user
+# Add the druid user and group
 RUN adduser --system --group --no-create-home druid \
       && chown -R druid:druid /druid \
       && chown -R druid:druid /tranquility
